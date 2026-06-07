@@ -1,18 +1,75 @@
 import { getFavorite } from "./controller/getFavorite.ts";
 import { downloadGallery } from "./helper/downloadGallery.ts";
-// import { getSubdirs } from "./helper/getSubdirs.ts";
-// import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
+import { fileSystemSafeNaming } from "./helper/fileSystemSafeNaming.ts";
+import { getSubdirs } from "./helper/getSubdirs.ts";
+import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
+import { favoriteRateLimit, zipUrlRateLimit } from "./helper/rateLimits.ts";
+import { renderProgress } from "./helper/renderProgress.ts";
+import { createRateLimiter } from "./helper/createRateLimiter.ts";
+import { updateProgress } from "./helper/updateProgress.ts";
 
-// const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const subdirs = await getSubdirs(localLocation);
+const start = Date.now();
 
-// const subdirs = await getSubdirs(localLocation);
+const consumeFavoriteLimit = createRateLimiter(favoriteRateLimit);
+const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
 
-const favorites = await getFavorite(1);
-const gallery = favorites.result[4];
-await downloadGallery(gallery);
-// for (const gallery of favorites.result) {
-//   if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) continue;
-//   await downloadGallery(gallery);
-// }
+let programIsRunning = true;
+let currentFavoritesPage = 0;
 
-console.log("Waiting for graceful termination. Do not exit.");
+let galleryProcessed = 0;
+let gallerySkipped = 0;
+let galleryDownloaded = 0;
+
+renderProgress(start, {
+  processed: galleryProcessed,
+  skipped: gallerySkipped,
+  downloaded: galleryDownloaded,
+});
+
+while (programIsRunning) {
+  currentFavoritesPage += 1;
+
+  await consumeFavoriteLimit();
+  const favorites = await getFavorite(currentFavoritesPage); // API used
+
+  for (const gallery of favorites.result) {
+    galleryProcessed += 1;
+    updateProgress(start, {
+      processed: galleryProcessed,
+      skipped: gallerySkipped,
+      downloaded: galleryDownloaded,
+    });
+
+    if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) {
+      gallerySkipped += 1;
+      updateProgress(start, {
+        processed: galleryProcessed,
+        skipped: gallerySkipped,
+        downloaded: galleryDownloaded,
+      });
+      continue;
+    }
+
+    await consumeDownloadLimit();
+    await downloadGallery(gallery); // API used
+
+    galleryDownloaded += 1;
+    updateProgress(start, {
+      processed: galleryProcessed,
+      skipped: gallerySkipped,
+      downloaded: galleryDownloaded,
+    });
+  }
+
+  if (
+    !favorites.total ||
+    galleryProcessed >= favorites.total ||
+    currentFavoritesPage > favorites.num_pages
+  ) {
+    programIsRunning = false;
+  }
+}
+
+console.log("Finished program. Waiting for graceful termination.");
