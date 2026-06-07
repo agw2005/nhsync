@@ -1,12 +1,18 @@
 import { getFavorite } from "./controller/getFavorite.ts";
+import { downloadGallery } from "./helper/downloadGallery.ts";
+// import { getSubdirs } from "./helper/getSubdirs.ts";
+// import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
 
-const favorites = await getFavorite(2);
-const galleries = favorites.result;
-const galleriesPerPage = favorites.per_page;
-const favoritesPages = favorites.num_pages;
-const totalGalleries = favorites.total;
+// const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
 
-console.log(galleries[0]);
-console.log(galleriesPerPage);
-console.log(favoritesPages);
-console.log(totalGalleries);
+// const subdirs = await getSubdirs(localLocation);
+
+const favorites = await getFavorite(1);
+const gallery = favorites.result[4];
+await downloadGallery(gallery);
+// for (const gallery of favorites.result) {
+//   if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) continue;
+//   await downloadGallery(gallery);
+// }
+
+console.log("Waiting for graceful termination. Do not exit.");
