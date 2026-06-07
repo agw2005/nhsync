@@ -44,6 +44,10 @@ export const getFavorite = async (page: number = 1): Promise<Favorites> => {
         throw new Error(`(Status code 429) Too many requests`);
     }
 
+    if (!response.ok) {
+      throw new Error(`(Status code ${response.status}) Other Error`);
+    }
+
     const data = (await response.json()) as Favorites;
     return data;
   } catch (error) {
