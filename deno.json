@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "exports": "./mod.ts",
   "tasks": {
-    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-sys --watch main.ts"
+    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-sys --allow-net --watch main.ts",
+    "exec": "deno run --allow-env --env=.env --allow-read --allow-write --allow-sys --allow-net main.ts"
   },
   "imports": {
     "@std/fs": "jsr:@std/fs@^1.0.24",
