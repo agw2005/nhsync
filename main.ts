@@ -42,10 +42,9 @@ while (programIsRunning) {
   const favorites = await getFavorite(currentFavoritesPage); // API used
 
   for (const gallery of favorites.result) {
-    galleryProcessed += 1;
-
     if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) {
       gallerySkipped += 1;
+      galleryProcessed += 1;
       continue;
     }
 
@@ -53,6 +52,7 @@ while (programIsRunning) {
     await downloadGallery(gallery); // API used
 
     galleryDownloaded += 1;
+    galleryProcessed += 1;
   }
 
   if (
