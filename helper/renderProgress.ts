@@ -5,7 +5,7 @@ export const renderProgress = (start: number, progress: {
   skipped: number;
   downloaded: number;
 }) => {
-  const secondsElapsed = elapsed(start) / 1000;
+  const secondsElapsed = (elapsed(start) / 1000).toFixed(1);
 
   process.stdout.write(
     `[${secondsElapsed}s] Galleries processed   : ${progress.processed}\n` +

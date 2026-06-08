@@ -5,7 +5,7 @@ export const updateProgress = (start: number, progress: {
   skipped: number;
   downloaded: number;
 }) => {
-  const secondsElapsed = elapsed(start) / 1000;
+  const secondsElapsed = (elapsed(start) / 1000).toFixed(1);
 
   process.stdout.write("\x1b[3A");
 

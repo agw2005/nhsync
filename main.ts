@@ -28,6 +28,14 @@ renderProgress(start, {
   downloaded: galleryDownloaded,
 });
 
+setInterval(() => {
+  updateProgress(start, {
+    processed: galleryProcessed,
+    skipped: gallerySkipped,
+    downloaded: galleryDownloaded,
+  });
+}, 100);
+
 while (programIsRunning) {
   currentFavoritesPage += 1;
 
@@ -36,19 +44,9 @@ while (programIsRunning) {
 
   for (const gallery of favorites.result) {
     galleryProcessed += 1;
-    updateProgress(start, {
-      processed: galleryProcessed,
-      skipped: gallerySkipped,
-      downloaded: galleryDownloaded,
-    });
 
     if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) {
       gallerySkipped += 1;
-      updateProgress(start, {
-        processed: galleryProcessed,
-        skipped: gallerySkipped,
-        downloaded: galleryDownloaded,
-      });
       continue;
     }
 
@@ -56,11 +54,6 @@ while (programIsRunning) {
     await downloadGallery(gallery); // API used
 
     galleryDownloaded += 1;
-    updateProgress(start, {
-      processed: galleryProcessed,
-      skipped: gallerySkipped,
-      downloaded: galleryDownloaded,
-    });
   }
 
   if (
