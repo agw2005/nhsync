@@ -1,3 +1,5 @@
+// deno run test/progress.test.ts
+
 import { renderProgress } from "../helper/renderProgress.ts";
 import { updateProgress } from "../helper/updateProgress.ts";
 
