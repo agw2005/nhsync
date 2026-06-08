@@ -1,15 +1,23 @@
 {
   "name": "nhsync",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "exports": "./mod.ts",
   "tasks": {
-    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-sys --allow-net --watch main.ts",
-    "exec": "deno run --allow-env --env=.env --allow-read --allow-write --allow-sys --allow-net main.ts"
+    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-net main.ts",
+    "ship_windows": "deno compile --allow-read --allow-write --allow-sys --allow-net --target x86_64-pc-windows-msvc --output nhsync main.ts",
+    "ship_linux": "deno compile --allow-read --allow-write --allow-sys --allow-net --target x86_64-unknown-linux-gnu --output nhsync main.ts",
+    "test_download": "deno run --allow-env --allow-net --env=.env --allow-read --allow-sys --allow-write test/downloadZipUrl.test.ts",
+    "test_favorites": "deno run --allow-env --allow-net --env=.env test/favorites.test.ts",
+    "test_progress": "deno run test/progress.test.ts"
   },
   "imports": {
     "@std/async": "jsr:@std/async@^1.4.0",
+    "@std/cli": "jsr:@std/cli@^1.0.30",
     "@std/fs": "jsr:@std/fs@^1.0.24",
     "@std/path": "jsr:@std/path@^1.1.5",
     "@zip-js/zip-js": "jsr:@zip-js/zip-js@^2.8.26"
+  },
+  "compile": {
+    "exclude": ["./.env", "**/*.test.ts"]
   }
 }

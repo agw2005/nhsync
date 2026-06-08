@@ -2,13 +2,25 @@ import { getFavorite } from "./controller/getFavorite.ts";
 import { downloadGallery } from "./helper/downloadGallery.ts";
 import { fileSystemSafeNaming } from "./helper/fileSystemSafeNaming.ts";
 import { getSubdirs } from "./helper/getSubdirs.ts";
-import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
 import { favoriteRateLimit, zipUrlRateLimit } from "./helper/rateLimits.ts";
 import { createRateLimiter } from "./helper/createRateLimiter.ts";
 import { renderProgress, updateProgress } from "./helper/progressRenderer.ts";
+import { parseArgs } from "@std/cli/parse-args";
 
-const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
-const apiKey = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const flags = parseArgs(Deno.args, {
+  string: ["out-dir", "api-key"],
+  alias: { o: "out-dir", k: "api-key" },
+});
+
+if (!flags["out-dir"] || !flags["api-key"]) {
+  console.error(
+    "Missing required arguments. Please provide --out-dir and --api-key.",
+  );
+  Deno.exit(1);
+}
+
+const localLocation = flags["out-dir"];
+const apiKey = flags["api-key"];
 
 const subdirs = await getSubdirs(localLocation);
 const start = Date.now();
