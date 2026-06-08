@@ -19,12 +19,18 @@ import { unzip } from "./unzip.ts";
  *
  * @param gallery The gallery that are to be downloaded.
  * @param key Nhentai API key
+ * @param localLocation Path to where the local galleries will be stored
  */
-export const downloadGallery = async (gallery: Gallery, key: string) => {
+export const downloadGallery = async (
+  gallery: Gallery,
+  key: string,
+  localLocation: string,
+) => {
   const { url } = await getDownloadZipUrl(gallery.id, key);
   const zipLocation = await downloadZipFile(
     url,
     fileSystemSafeNaming(gallery.english_title),
+    localLocation,
   );
   await unzip(zipLocation);
   await deleteFile(zipLocation);

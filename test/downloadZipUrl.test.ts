@@ -49,7 +49,7 @@ for (const gallery of sampleGallery) {
     }s)(${index})(${gallery.id}) Gallery isn\'t downloaded. Downloading the gallery.`,
   );
   await consumeDownloadLimit();
-  await downloadGallery(gallery, apiKey); // API used
+  await downloadGallery(gallery, apiKey, localLocation); // API used
 
   console.log(
     `(${

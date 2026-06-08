@@ -51,7 +51,7 @@ while (programIsRunning) {
     }
 
     await consumeDownloadLimit();
-    await downloadGallery(gallery, apiKey); // API used
+    await downloadGallery(gallery, apiKey, localLocation); // API used
 
     galleryDownloaded += 1;
     galleryProcessed += 1;
