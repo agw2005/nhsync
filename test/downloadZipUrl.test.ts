@@ -23,8 +23,9 @@ const sampleId = sampleGallery.map((gallery) => gallery.id);
 console.log(`Sample galleries :`);
 console.log(sampleId);
 
-let index = 1;
+let index = 0;
 for (const gallery of sampleGallery) {
+  index += 1;
   console.log(
     `(${
       (elapsed(start) / 1000).toFixed(1)
@@ -53,5 +54,4 @@ for (const gallery of sampleGallery) {
       (elapsed(start) / 1000).toFixed(1)
     }s)(${index})(${gallery.id}) Succesfully downloaded gallery.`,
   );
-  index += 1;
 }

@@ -63,5 +63,3 @@ while (programIsRunning) {
     programIsRunning = false;
   }
 }
-
-console.log("Finished program. Waiting for graceful termination.");

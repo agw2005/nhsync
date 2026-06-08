@@ -6,8 +6,9 @@ export const favoriteRateLimit: RateLimit = {
   timeMilliseconds: 60000,
 };
 
-// 10/5min per API key owner
+// (Not correct) 10/5min per API key owner
+// 7/5min per user
 export const zipUrlRateLimit: RateLimit = {
-  usage: 10,
+  usage: 7,
   timeMilliseconds: 300000,
 };

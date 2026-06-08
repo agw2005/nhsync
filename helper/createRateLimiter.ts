@@ -3,29 +3,30 @@ import type { RateLimit } from "../model/RateLimit.ts";
 
 export const createRateLimiter = (limit: RateLimit) => {
   const error = 2500;
-  let windowStart = Date.now();
-  let usage = 0;
+  const requestTimestamps: number[] = [];
 
   const consumeRateLimit = async () => {
-    const now = Date.now();
+    while (true) {
+      const now = Date.now();
+      const cutoff = now - limit.timeMilliseconds;
 
-    if (now - windowStart >= limit.timeMilliseconds) {
-      windowStart = now;
-      usage = 0;
-    }
-
-    if (usage >= limit.usage) {
-      const elapsedMs = Date.now() - windowStart;
-
-      if (elapsedMs < limit.timeMilliseconds) {
-        await delay(limit.timeMilliseconds - (now - windowStart) + error);
+      while (requestTimestamps.length > 0 && requestTimestamps[0] <= cutoff) {
+        requestTimestamps.shift();
       }
 
-      windowStart = Date.now();
-      usage = 0;
-    }
+      if (requestTimestamps.length < limit.usage) {
+        requestTimestamps.push(now);
+        break;
+      }
 
-    usage++;
+      const oldestTimestamp = requestTimestamps[0];
+      const waitTime = limit.timeMilliseconds - (now - oldestTimestamp) +
+        error;
+
+      if (waitTime > 0) {
+        await delay(waitTime);
+      }
+    }
   };
 
   return consumeRateLimit;
