@@ -1,5 +1,25 @@
 import elapsed from "./elapsed.ts";
 
+/**
+ * Initialize terminal output layout to show synchronization progress metrics
+ *
+ * @example Usage
+ * ```ts
+ * import { renderProgress } from "./helper/progress.ts";
+ * const start = Date.now();
+ * let galleryProcessed = 0;
+ * let gallerySkipped = 0;
+ * let galleryDownloaded = 0;
+ * renderProgress(start, {
+ *  processed: galleryProcessed,
+ *  skipped: gallerySkipped,
+ *  downloaded: galleryDownloaded,
+ * });
+ * ```
+ *
+ * @param start The unix timestamp indicating when the process started.
+ * @param progress Object containing the current tally of processed, skipped, and downloaded galleries.
+ */
 export const renderProgress = (start: number, progress: {
   processed: number;
   skipped: number;
@@ -15,6 +35,33 @@ export const renderProgress = (start: number, progress: {
   );
 };
 
+/**
+ * Updates existing terminal layout in-place to sync with the current progress metrics
+ *
+ * @example Usage
+ * ```ts
+ * import { updateProgress } from "./progress.ts";
+ * const start = Date.now();
+ * let galleryProcessed = 0;
+ * let gallerySkipped = 0;
+ * let galleryDownloaded = 0;
+ * renderProgress(start, {
+ *  processed: galleryProcessed,
+ *  skipped: gallerySkipped,
+ *  downloaded: galleryDownloaded,
+ * });
+ * setInterval(() => {
+ *  updateProgress(start, {
+ *    processed: galleryProcessed,
+ *    skipped: gallerySkipped,
+ *    downloaded: galleryDownloaded,
+ *  });
+ * }, 100);
+ * ```
+ *
+ * @param start The unix timestamp indicating when the process started.
+ * @param progress Object containing the updated tally of processed, skipped, and downloaded galleries.
+ */
 export const updateProgress = (start: number, progress: {
   processed: number;
   skipped: number;

@@ -1,6 +1,24 @@
 import { delay } from "@std/async/delay";
 import type { RateLimit } from "../model/RateLimit.ts";
 
+/**
+ * Creates a sliding-window rate limiter factory that limits operation execution based on a rate limit
+ *
+ * @example Usage
+ * ```ts
+ * import { createRateLimiter } from "./rateLimiter.ts";
+ * const operationRateLimit = { timeMilliseconds: 60000, usage: 100 };
+ * const consumeOperationRateLimit = createRateLimiter(operationRateLimit);
+ * await consumeOperationRateLimit();
+ * await operation()
+ * ```
+ *
+ * @note Call the returned function before whenever the rate-limited operation is called.
+ *
+ * @param limit The rate limit configuration of an operation.
+ *
+ * @returns An async function that resolves once a sliding-window slot becomes available.
+ */
 export const createRateLimiter = (limit: RateLimit) => {
   const error = 2500;
   const requestTimestamps: number[] = [];
