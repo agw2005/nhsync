@@ -4,9 +4,8 @@ import { fileSystemSafeNaming } from "./helper/fileSystemSafeNaming.ts";
 import { getSubdirs } from "./helper/getSubdirs.ts";
 import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
 import { favoriteRateLimit, zipUrlRateLimit } from "./helper/rateLimits.ts";
-import { renderProgress } from "./helper/renderProgress.ts";
 import { createRateLimiter } from "./helper/createRateLimiter.ts";
-import { updateProgress } from "./helper/updateProgress.ts";
+import { renderProgress, updateProgress } from "./helper/progressRenderer.ts";
 
 const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
 const subdirs = await getSubdirs(localLocation);

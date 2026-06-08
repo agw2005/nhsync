@@ -1,7 +1,6 @@
 // deno run test/progress.test.ts
 
-import { renderProgress } from "../helper/renderProgress.ts";
-import { updateProgress } from "../helper/updateProgress.ts";
+import { renderProgress, updateProgress } from "../helper/progressRenderer.ts";
 
 const start = Date.now();
 let galleryProcessed = 0;
