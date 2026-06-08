@@ -27,5 +27,4 @@ export const downloadGallery = async (gallery: Gallery) => {
   );
   await unzip(zipLocation);
   await deleteFile(zipLocation);
-  console.log(`Downloaded gallery ${gallery.id}`);
 };
