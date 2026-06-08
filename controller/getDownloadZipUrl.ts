@@ -1,5 +1,4 @@
 import { appAgent } from "../helper/appAgent.ts";
-import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import type { Download } from "../model/Download.ts";
 
 /**
@@ -15,16 +14,17 @@ import type { Download } from "../model/Download.ts";
  * ```
  *
  * @param galleryId Id of a gallery
+ * @param key Nhentai API key
  *
  * @returns The url and its expiration date for downloading the gallery as a zip.
  * @throws {Error} According to the response status code.
  */
 export const getDownloadZipUrl = async (
   galleryId: number,
+  key: string,
 ): Promise<Download> => {
   const url = `https://nhentai.net/api/v2/galleries/${galleryId}/download`;
 
-  const key = loadGenericEnv("API_KEY", "string");
   const options: RequestInit = {
     method: "POST",
     headers: {

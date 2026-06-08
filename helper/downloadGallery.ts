@@ -18,9 +18,10 @@ import { unzip } from "./unzip.ts";
  * ```
  *
  * @param gallery The gallery that are to be downloaded.
+ * @param key Nhentai API key
  */
-export const downloadGallery = async (gallery: Gallery) => {
-  const { url } = await getDownloadZipUrl(gallery.id);
+export const downloadGallery = async (gallery: Gallery, key: string) => {
+  const { url } = await getDownloadZipUrl(gallery.id, key);
   const zipLocation = await downloadZipFile(
     url,
     fileSystemSafeNaming(gallery.english_title),

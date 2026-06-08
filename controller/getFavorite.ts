@@ -1,5 +1,4 @@
 import { appAgent } from "../helper/appAgent.ts";
-import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import type { Favorites } from "../model/Favorite.ts";
 
 /**
@@ -16,14 +15,17 @@ import type { Favorites } from "../model/Favorite.ts";
  * ```
  *
  * @param page Which page to extract the favorites galleries from
+ * @param key Nhentai API key
  *
  * @returns The `Favorites` value of page `page`.
  * @throws {Error} According to the response status code.
  */
-export const getFavorite = async (page: number = 1): Promise<Favorites> => {
+export const getFavorite = async (
+  page: number = 1,
+  key: string,
+): Promise<Favorites> => {
   const url = `https://nhentai.net/api/v2/favorites?page=${page}`;
 
-  const key = loadGenericEnv("API_KEY", "string");
   const options: RequestInit = {
     method: "GET",
     headers: {

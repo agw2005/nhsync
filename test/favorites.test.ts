@@ -2,7 +2,10 @@
 
 import { getFavorite } from "../controller/getFavorite.ts";
 import { createRateLimiter } from "../helper/createRateLimiter.ts";
+import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import { favoriteRateLimit } from "../helper/rateLimits.ts";
+
+const apiKey = loadGenericEnv("LOCAL_DIRECTORY", "string");
 
 let programIsRunning = true;
 let currentFavoritesPage = 0;
@@ -14,7 +17,7 @@ while (programIsRunning) {
   currentFavoritesPage += 1;
 
   await consumeFavoriteLimit();
-  const favorites = await getFavorite(currentFavoritesPage); // API used
+  const favorites = await getFavorite(currentFavoritesPage, apiKey); // API used
 
   console.log(`Result for page ${currentFavoritesPage}`);
   const favoriteIds = favorites.result.map((gallery) => {

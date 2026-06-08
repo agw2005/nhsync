@@ -9,14 +9,16 @@ import { getSubdirs } from "../helper/getSubdirs.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import { zipUrlRateLimit } from "../helper/rateLimits.ts";
 
-const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
 const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const apiKey = loadGenericEnv("LOCAL_DIRECTORY", "string");
+
+const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
 const subdirs = await getSubdirs(localLocation);
 const start = Date.now();
 
 const samplePage = [1, 2, 3];
 const sampleGallery =
-  (await Promise.all(samplePage.map((id) => getFavorite(id))))
+  (await Promise.all(samplePage.map((id) => getFavorite(id, apiKey))))
     .flatMap((favorite) => favorite.result.map((gallery) => gallery));
 
 const sampleId = sampleGallery.map((gallery) => gallery.id);
@@ -47,7 +49,7 @@ for (const gallery of sampleGallery) {
     }s)(${index})(${gallery.id}) Gallery isn\'t downloaded. Downloading the gallery.`,
   );
   await consumeDownloadLimit();
-  await downloadGallery(gallery); // API used
+  await downloadGallery(gallery, apiKey); // API used
 
   console.log(
     `(${
