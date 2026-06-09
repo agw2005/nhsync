@@ -38,14 +38,16 @@ let galleryProcessed = 0;
 let gallerySkipped = 0;
 let galleryDownloaded = 0;
 
-renderProgress(start, {
+renderProgress({
+  start,
   processed: galleryProcessed,
   skipped: gallerySkipped,
   downloaded: galleryDownloaded,
 });
 
 setInterval(() => {
-  updateProgress(start, {
+  updateProgress({
+    start,
     processed: galleryProcessed,
     skipped: gallerySkipped,
     downloaded: galleryDownloaded,
@@ -73,14 +75,14 @@ while (programIsRunning) {
       continue;
     }
 
-    const zipUrl = await getDownloadZipUrl({ gallery: gallery, key: apiKey });
-
     await consumeDownloadLimit();
+    const zipUrl = await getDownloadZipUrl({ gallery: gallery, key: apiKey }); // API used
+
     const zipLocation = await downloadZipFile({
       downloadUrl: zipUrl,
       gallery: gallery,
       localLocation: localLocation,
-    }); // API used
+    });
 
     await unzip(zipLocation);
     await deleteFile(zipLocation);
