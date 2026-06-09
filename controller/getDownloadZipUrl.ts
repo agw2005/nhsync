@@ -3,19 +3,19 @@ import type { Download } from "../model/Download.ts";
 import type { Gallery } from "../model/Gallery.ts";
 
 /**
- * Returns a URL to download a gallery as a zip, alongside the expiry time of that URL
+ * Returns a URL to download a gallery as a zip, alongside the expiry time of that URL.
  *
  * @example Usage
  * ```ts
  * import { getDownloadZipUrl } from "./controller/getDownloadZipUrl.ts";
- * const downloadInfo = await getDownloadZipUrl(610590);
+ * const downloadInfo = await getDownloadZipUrl({ gallery: mockGallery, key: "YOUR_API_KEY" });
  * const zipUrl = downloadInfo.url;
  * const expirationDate = new Date(downloadInfo.expires_at);
- *
  * ```
  *
- * @param galleryId Id of a gallery
- * @param key Nhentai API key
+ * @param option Configuration object for the request.
+ * @param option.gallery The `Gallery` object to be downloaded.
+ * @param option.key Nhentai API key.
  *
  * @returns The url and its expiration date for downloading the gallery as a zip.
  * @throws {Error} According to the response status code.

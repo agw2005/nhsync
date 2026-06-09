@@ -1,7 +1,7 @@
 import elapsed from "./elapsed.ts";
 
 /**
- * Initialize terminal output layout to show synchronization progress metrics
+ * Initialize terminal output layout to show synchronization progress metrics.
  *
  * @example Usage
  * ```ts
@@ -10,64 +10,75 @@ import elapsed from "./elapsed.ts";
  * let galleryProcessed = 0;
  * let gallerySkipped = 0;
  * let galleryDownloaded = 0;
- * renderProgress(start, {
- *  processed: galleryProcessed,
- *  skipped: gallerySkipped,
- *  downloaded: galleryDownloaded,
+ * renderProgress({
+ * start: start,
+ * processed: galleryProcessed,
+ * skipped: gallerySkipped,
+ * downloaded: galleryDownloaded,
  * });
  * ```
  *
- * @param start The unix timestamp indicating when the process started.
- * @param progress Object containing the current tally of processed, skipped, and downloaded galleries.
+ * @param data Configuration object containing progress metrics.
+ * @param data.start The unix timestamp indicating when the process started.
+ * @param data.processed The current tally of processed galleries.
+ * @param data.skipped The current tally of skipped galleries.
+ * @param data.downloaded The current tally of downloaded galleries.
  */
-export const renderProgress = (start: number, progress: {
+export const renderProgress = (data: {
+  start: number;
   processed: number;
   skipped: number;
   downloaded: number;
 }) => {
-  const secondsElapsed = (elapsed(start) / 1000).toFixed(1);
+  const secondsElapsed = (elapsed(data.start) / 1000).toFixed(1);
 
   process.stdout.write(
     `Elapsed time : ${secondsElapsed}s\n` +
-      `Galleries processed   : ${progress.processed}\n` +
-      `Galleries skipped     : ${progress.skipped}\n` +
-      `Galleries downloaded  : ${progress.downloaded}\n`,
+      `Galleries processed   : ${data.processed}\n` +
+      `Galleries skipped     : ${data.skipped}\n` +
+      `Galleries downloaded  : ${data.downloaded}\n`,
   );
 };
 
 /**
- * Updates existing terminal layout in-place to sync with the current progress metrics
+ * Updates existing terminal layout in-place to sync with the current progress metrics.
  *
  * @example Usage
  * ```ts
- * import { updateProgress } from "./progress.ts";
+ * import { updateProgress, renderProgress } from "./progress.ts";
  * const start = Date.now();
  * let galleryProcessed = 0;
  * let gallerySkipped = 0;
  * let galleryDownloaded = 0;
- * renderProgress(start, {
- *  processed: galleryProcessed,
- *  skipped: gallerySkipped,
- *  downloaded: galleryDownloaded,
+ * renderProgress({
+ * start: start,
+ * processed: galleryProcessed,
+ * skipped: gallerySkipped,
+ * downloaded: galleryDownloaded,
  * });
  * setInterval(() => {
- *  updateProgress(start, {
- *    processed: galleryProcessed,
- *    skipped: gallerySkipped,
- *    downloaded: galleryDownloaded,
- *  });
+ * updateProgress({
+ * start: start,
+ * processed: galleryProcessed,
+ * skipped: gallerySkipped,
+ * downloaded: galleryDownloaded,
+ * });
  * }, 100);
  * ```
  *
- * @param start The unix timestamp indicating when the process started.
- * @param progress Object containing the updated tally of processed, skipped, and downloaded galleries.
+ * @param data Configuration object containing the updated progress metrics.
+ * @param data.start The unix timestamp indicating when the process started.
+ * @param data.processed The updated tally of processed galleries.
+ * @param data.skipped The updated tally of skipped galleries.
+ * @param data.downloaded The updated tally of downloaded galleries.
  */
-export const updateProgress = (start: number, progress: {
+export const updateProgress = (data: {
+  start: number;
   processed: number;
   skipped: number;
   downloaded: number;
 }) => {
-  const secondsElapsed = (elapsed(start) / 1000).toFixed(1);
+  const secondsElapsed = (elapsed(data.start) / 1000).toFixed(1);
 
   process.stdout.write("\x1b[4A");
 
@@ -78,16 +89,16 @@ export const updateProgress = (start: number, progress: {
 
   process.stdout.write("\x1b[2K");
   process.stdout.write(
-    `Galleries processed   : ${progress.processed}\n`,
+    `Galleries processed   : ${data.processed}\n`,
   );
 
   process.stdout.write("\x1b[2K");
   process.stdout.write(
-    `Galleries skipped     : ${progress.skipped}\n`,
+    `Galleries skipped     : ${data.skipped}\n`,
   );
 
   process.stdout.write("\x1b[2K");
   process.stdout.write(
-    `Galleries downloaded  : ${progress.downloaded}\n`,
+    `Galleries downloaded  : ${data.downloaded}\n`,
   );
 };

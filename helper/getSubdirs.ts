@@ -1,7 +1,7 @@
 import { exists } from "@std/fs";
 
 /**
- * Return an array of names of subdirectories inside the `dir`
+ * Return an array of names of subdirectories inside the `dir`.
  *
  * @example Usage
  * ```ts
@@ -13,7 +13,7 @@ import { exists } from "@std/fs";
  * assertEquals(subDirs, ["dir1", "dir2", "dir3"]);
  * ```
  *
- * @param dir Path to extract the subdirectories from
+ * @param dir Path to extract the subdirectories from.
  *
  * @returns The names of `dir` subdirectories.
  * @throws {Deno.errors.NotADirectory} If `dir` is not a readable directory.

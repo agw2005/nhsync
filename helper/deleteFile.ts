@@ -3,11 +3,27 @@
  *
  * @example Usage
  * ```ts
- * const { url } = await getDownloadZipUrl(gallery.id);
- * const zipLocation = await downloadZipFile(url,fileSystemSafeNaming(gallery.english_title));
- * const _unzippedLocation = await unzip(zipLocation);
+ * const galleryAlreadyDownloaded = galleryAlreadyExist({
+ * subdirectories: subdirs,
+ * gallery: gallery});
+ *
+ * if (galleryAlreadyDownloaded) {
+ * gallerySkipped += 1;
+ * galleryProcessed += 1;
+ * continue;
+ * }
+ *
+ * const zipUrl = await getDownloadZipUrl({ gallery: gallery, key: apiKey });
+ *
+ * await consumeDownloadLimit();
+ * const zipLocation = await downloadZipFile({
+ * downloadUrl: zipUrl,
+ * gallery: gallery,
+ * localLocation: localLocation,
+ * });
+ *
+ * await unzip(zipLocation);
  * await deleteFile(zipLocation);
- * console.log(`Succesfully downloaded gallery ${gallery.id}`);
  * ```
  *
  * @param location The path to the file.

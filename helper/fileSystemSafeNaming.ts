@@ -20,7 +20,7 @@
  *
  * @returns String that is safe to be filename or directory name.
  */
-export const fileSystemSafeNaming = (str: string): string => {
+export const fileSystemSafeNaming = (str: string) => {
   // deno-lint-ignore no-control-regex
   const invalidCharsRegex = new RegExp('[<>:"/\\\\|?*\\x00-\\x1F]', "g");
   return str.replace(invalidCharsRegex, "_");
