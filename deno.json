@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "exports": "./mod.ts",
   "tasks": {
-    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-net main.ts",
+    "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-net --allow-sys main.ts",
     "ship_windows": "deno compile --allow-read --allow-write --allow-sys --allow-net --target x86_64-pc-windows-msvc --output nhsync main.ts",
     "ship_linux": "deno compile --allow-read --allow-write --allow-sys --allow-net --target x86_64-unknown-linux-gnu --output nhsync main.ts",
     "test_download": "deno run --allow-env --allow-net --env=.env --allow-read --allow-sys --allow-write test/downloadZipUrl.test.ts",
