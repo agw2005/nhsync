@@ -1,5 +1,6 @@
 import { appAgent } from "../helper/appAgent.ts";
 import type { Download } from "../model/Download.ts";
+import type { Gallery } from "../model/Gallery.ts";
 
 /**
  * Returns a URL to download a gallery as a zip, alongside the expiry time of that URL
@@ -19,16 +20,17 @@ import type { Download } from "../model/Download.ts";
  * @returns The url and its expiration date for downloading the gallery as a zip.
  * @throws {Error} According to the response status code.
  */
-export const getDownloadZipUrl = async (
-  galleryId: number,
-  key: string,
-): Promise<Download> => {
-  const url = `https://nhentai.net/api/v2/galleries/${galleryId}/download`;
+export const getDownloadZipUrl = async (option: {
+  gallery: Gallery;
+  key: string;
+}): Promise<Download> => {
+  const url =
+    `https://nhentai.net/api/v2/galleries/${option.gallery.id}/download`;
 
   const options: RequestInit = {
     method: "POST",
     headers: {
-      "Authorization": `Key ${key}`,
+      "Authorization": `Key ${option.key}`,
       "User-Agent": `${appAgent()}`,
     },
   };

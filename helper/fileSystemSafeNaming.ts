@@ -4,7 +4,6 @@
  * @example Usage
  * ```ts
  * import { getFavorite } from "./controller/getFavorite.ts";
- * import { downloadGallery } from "./helper/downloadGallery.ts";
  * import { fileSystemSafeNaming } from "./helper/fileSystemSafeNaming.ts";
  * import { getSubdirs } from "./helper/getSubdirs.ts";
  * import { loadGenericEnv } from "./helper/loadGenericEnv.ts";
@@ -12,10 +11,8 @@
  * const subdirs = await getSubdirs(localLocation);
  * const favorites = await getFavorite(1);
  * const gallery = favorites.result[3];
- * await downloadGallery(gallery);
  * for (const gallery of favorites.result) {
  *   if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) continue;
- *   await downloadGallery(gallery);
  * }
  * ```
  *

@@ -17,7 +17,10 @@ while (programIsRunning) {
   currentFavoritesPage += 1;
 
   await consumeFavoriteLimit();
-  const favorites = await getFavorite(currentFavoritesPage, apiKey); // API used
+  const favorites = await getFavorite({
+    page: currentFavoritesPage,
+    key: apiKey,
+  }); // API used
 
   console.log(`Result for page ${currentFavoritesPage}`);
   const favoriteIds = favorites.result.map((gallery) => {

@@ -20,16 +20,16 @@ import type { Favorites } from "../model/Favorite.ts";
  * @returns The `Favorites` value of page `page`.
  * @throws {Error} According to the response status code.
  */
-export const getFavorite = async (
-  page: number = 1,
-  key: string,
-): Promise<Favorites> => {
-  const url = `https://nhentai.net/api/v2/favorites?page=${page}`;
+export const getFavorite = async (option: {
+  page?: number;
+  key: string;
+}): Promise<Favorites> => {
+  const url = `https://nhentai.net/api/v2/favorites?page=${option.page || 1}`;
 
   const options: RequestInit = {
     method: "GET",
     headers: {
-      "Authorization": `Key ${key}`,
+      "Authorization": `Key ${option.key}`,
       "User-Agent": `${appAgent()}`,
     },
   };
