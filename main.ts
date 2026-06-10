@@ -13,6 +13,8 @@ import { ensureFile } from "@std/fs";
 import { join } from "@std/path";
 import { logToFile } from "./helper/logToFile.ts";
 import elapsed from "./helper/elapsed.ts";
+import { delay } from "@std/async";
+import { ensureFileDontExist } from "./helper/ensureFileDontExist.ts";
 
 const flags = parseArgs(Deno.args, {
   string: ["out-dir", "api-key"],
@@ -94,21 +96,56 @@ for await (
 
   // Download + unzip runs concurrently with subsequent zip URL fetches
   const task = (async () => {
-    const zipLocation = await downloadZipFile({
-      downloadUrl: zipUrl,
-      gallery,
-      localLocation,
-    });
-    await unzip(zipLocation);
-    await deleteFile(zipLocation);
-    galleryDownloaded += 1;
-    galleryProcessed += 1;
+    const maxRetries = 5;
+    let retryAttempt = 0;
+    let currentZipUrl = zipUrl;
+    let currentZipLocation = "";
+
+    while (true) {
+      try {
+        const zipLocation = await downloadZipFile({
+          downloadUrl: currentZipUrl,
+          gallery,
+          localLocation,
+        });
+        currentZipLocation = zipLocation;
+        await unzip(currentZipLocation);
+        await deleteFile(zipLocation);
+        break;
+      } catch (err) {
+        retryAttempt += 1;
+        if (retryAttempt >= maxRetries) {
+          await logToFile(
+            `(${
+              (elapsed(start) / 1000).toFixed(1)
+            }s) Failed downloading gallery ${gallery.id} after ${maxRetries} attempts: ${err}`,
+          );
+          ensureFileDontExist(currentZipLocation);
+          throw new Error(
+            `Failed downloading gallery : ${gallery.id}`,
+          );
+        }
+        const backoff = Math.min(1000 * 2 ** retryAttempt, 30000);
+        await logToFile(
+          `(${
+            (elapsed(start) / 1000).toFixed(1)
+          }s) Retrying download for gallery ${gallery.id} (attempt ${retryAttempt}) in ${backoff}ms: ${err}`,
+        );
+        await delay(backoff);
+
+        await consumeDownloadLimit();
+        currentZipUrl = await getDownloadZipUrl({ gallery, key: apiKey });
+      }
+    }
 
     await logToFile(
       `(${
         (elapsed(start) / 1000).toFixed(1)
-      }s) Used download URL for gallery : ${gallery.id}`,
+      }s) Used download URL for gallery : ${gallery.id} (Attempts: ${retryAttempt})`,
     );
+
+    galleryDownloaded += 1;
+    galleryProcessed += 1;
   })();
 
   // Track the promise so we can apply back-pressure and await completion
