@@ -8,7 +8,8 @@
     "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@^1.1.5": "1.1.5",
-    "jsr:@zip-js/zip-js@^2.8.26": "2.8.26"
+    "jsr:@zip-js/zip-js@^2.8.26": "2.8.26",
+    "npm:sanitize-filename@^1.6.4": "1.6.4"
   },
   "jsr": {
     "@std/async@1.4.0": {
@@ -50,13 +51,31 @@
       "integrity": "2b78bfa2c5d43766c9a487fc0274981d45732de41bb5b82433d29d235be67191"
     }
   },
+  "npm": {
+    "sanitize-filename@1.6.4": {
+      "integrity": "sha512-9ZyI08PsvdQl2r/bBIGubpVdR3RR9sY6RDiWFPreA21C/EFlQhmgo20UZlNjZMMZNubusLhAQozkA0Od5J21Eg==",
+      "dependencies": [
+        "truncate-utf8-bytes"
+      ]
+    },
+    "truncate-utf8-bytes@1.0.2": {
+      "integrity": "sha512-95Pu1QXQvruGEhv62XCMO3Mm90GscOCClvrIUwCM0PYOXK3kaF3l3sIHxx71ThJfcbM2O5Au6SO3AWCSEfW4mQ==",
+      "dependencies": [
+        "utf8-byte-length"
+      ]
+    },
+    "utf8-byte-length@1.0.5": {
+      "integrity": "sha512-Xn0w3MtiQ6zoz2vFyUVruaCL53O/DwUvkEeOvj+uulMm0BkUGYWmBYVyElqZaSLhY6ZD0ulfU3aBra2aVT4xfA=="
+    }
+  },
   "workspace": {
     "dependencies": [
       "jsr:@std/async@^1.4.0",
       "jsr:@std/cli@^1.0.30",
       "jsr:@std/fs@^1.0.24",
       "jsr:@std/path@^1.1.5",
-      "jsr:@zip-js/zip-js@^2.8.26"
+      "jsr:@zip-js/zip-js@^2.8.26",
+      "npm:sanitize-filename@^1.6.4"
     ]
   }
 }

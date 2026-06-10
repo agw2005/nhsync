@@ -1,5 +1,5 @@
+import sanitize from "sanitize-filename";
 import type { Gallery } from "../model/Gallery.ts";
-import { fileSystemSafeNaming } from "./fileSystemSafeNaming.ts";
 
 /**
  * Checks if a gallery already exists within a specified list of subdirectories.
@@ -27,7 +27,7 @@ export const galleryAlreadyExist = (
 ) => {
   if (
     option.subdirectories.includes(
-      fileSystemSafeNaming(option.gallery.english_title),
+      sanitize(option.gallery.english_title),
     )
   ) {
     return true;

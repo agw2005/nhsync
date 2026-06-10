@@ -2,7 +2,7 @@ import { join } from "@std/path";
 import { ensureDir } from "@std/fs";
 import type { Download } from "../model/Download.ts";
 import type { Gallery } from "../model/Gallery.ts";
-import { fileSystemSafeNaming } from "./fileSystemSafeNaming.ts";
+import sanitize from "sanitize-filename";
 
 /**
  * Downloads a zip from a `url` to the path `localLocation` as `filename`.zip.
@@ -32,7 +32,7 @@ export const downloadZipFile = async (option: {
 }): Promise<string> => {
   const destinationPath = join(
     option.localLocation,
-    `${fileSystemSafeNaming(option.gallery.english_title)}.zip`,
+    `${sanitize(option.gallery.english_title)}.zip`,
   );
 
   await ensureDir(option.localLocation);
