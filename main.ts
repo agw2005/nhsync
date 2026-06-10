@@ -9,6 +9,10 @@ import { downloadZipFile } from "./helper/downloadZipFile.ts";
 import { unzip } from "./helper/unzip.ts";
 import { deleteFile } from "./helper/deleteFile.ts";
 import { favoritesGenerator } from "./controller/favoritesGenerator.ts";
+import { ensureFile } from "@std/fs";
+import { join } from "@std/path";
+import { logToFile } from "./helper/logToFile.ts";
+import elapsed from "./helper/elapsed.ts";
 
 const flags = parseArgs(Deno.args, {
   string: ["out-dir", "api-key"],
@@ -22,6 +26,9 @@ if (!flags["out-dir"] || !flags["api-key"]) {
   Deno.exit(1);
 }
 
+await ensureFile(join(Deno.cwd(), "nhsync.log"));
+await Deno.truncate(join(Deno.cwd(), "nhsync.log"));
+
 const localLocation = flags["out-dir"];
 const apiKey = flags["api-key"];
 
@@ -34,6 +41,7 @@ const consumeDownloadLimit = rateLimiterFactory(zipUrlRateLimit);
 let galleryProcessed = 0;
 let gallerySkipped = 0;
 let galleryDownloaded = 0;
+let page = 0;
 
 renderProgress({
   start,
@@ -60,6 +68,12 @@ for await (
     key: apiKey,
   }) // Each yielded gallery consumes an API usage
 ) {
+  page += 1;
+  await logToFile(
+    `(${
+      (elapsed(start) / 1000).toFixed(1)
+    }s) Used favorites API for page : ${page}`,
+  );
   const alreadyDownloaded = galleryAlreadyExist({
     subdirectories: subdirs,
     gallery,
@@ -78,6 +92,11 @@ for await (
 
   await consumeDownloadLimit();
   const zipUrl = await getDownloadZipUrl({ gallery, key: apiKey }); // API used
+  await logToFile(
+    `(${
+      (elapsed(start) / 1000).toFixed(1)
+    }s) Used download API for gallery : ${gallery.id}`,
+  );
 
   // Download + unzip runs concurrently with subsequent zip URL fetches
   const task = (async () => {
@@ -90,6 +109,12 @@ for await (
     await deleteFile(zipLocation);
     galleryDownloaded += 1;
     galleryProcessed += 1;
+
+    await logToFile(
+      `(${
+        (elapsed(start) / 1000).toFixed(1)
+      }s) Used download URL for gallery : ${gallery.id}`,
+    );
   })();
 
   // Track the promise so we can apply back-pressure and await completion
