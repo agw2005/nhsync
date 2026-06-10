@@ -27,6 +27,7 @@ for await (
   const gallery of favoritesGenerator({
     consumer: consumeFavoriteLimit,
     key: apiKey,
+    start,
   }) // Each yielded gallery consumes an API key
 ) {
   const alreadyDownloaded = galleryAlreadyExist({

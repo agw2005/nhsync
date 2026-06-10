@@ -41,7 +41,6 @@ const consumeDownloadLimit = rateLimiterFactory(zipUrlRateLimit);
 let galleryProcessed = 0;
 let gallerySkipped = 0;
 let galleryDownloaded = 0;
-let page = 0;
 
 renderProgress({
   start,
@@ -66,14 +65,9 @@ for await (
   const gallery of favoritesGenerator({
     consumer: consumeFavoriteLimit,
     key: apiKey,
+    start,
   }) // Each yielded gallery consumes an API usage
 ) {
-  page += 1;
-  await logToFile(
-    `(${
-      (elapsed(start) / 1000).toFixed(1)
-    }s) Used favorites API for page : ${page}`,
-  );
   const alreadyDownloaded = galleryAlreadyExist({
     subdirectories: subdirs,
     gallery,
