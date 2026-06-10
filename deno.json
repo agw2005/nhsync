@@ -1,6 +1,6 @@
 {
   "name": "nhsync",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "exports": "./mod.ts",
   "tasks": {
     "dev": "deno run --allow-env --env=.env --allow-read --allow-write --allow-net --allow-sys main.ts",

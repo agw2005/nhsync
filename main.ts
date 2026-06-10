@@ -133,8 +133,10 @@ for await (
         );
         await delay(backoff);
 
-        await consumeDownloadLimit();
-        currentZipUrl = await getDownloadZipUrl({ gallery, key: apiKey });
+        if (currentZipUrl.expires_at <= Date.now()) {
+          await consumeDownloadLimit();
+          currentZipUrl = await getDownloadZipUrl({ gallery, key: apiKey });
+        }
       }
     }
 
