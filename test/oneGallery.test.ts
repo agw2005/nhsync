@@ -7,8 +7,11 @@ import { getSubdirs } from "../helper/getSubdirs.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import { unzip } from "../helper/unzip.ts";
 
-const apiKey = loadGenericEnv("API_KEY", "string");
-const localPath = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const apiKey = loadGenericEnv({ identifier: "API_KEY", type: "string" });
+const localPath = loadGenericEnv({
+  identifier: "LOCAL_DIRECTORY",
+  type: "string",
+});
 
 let subdirs = await getSubdirs(localPath);
 

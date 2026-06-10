@@ -1,73 +1,71 @@
 // deno run --allow-env --allow-net --env=.env --allow-read --allow-sys --allow-write test/downloadZipUrl.test.ts
 
+import { delay } from "@std/async/delay";
+import { favoritesGenerator } from "../controller/favoritesGenerator.ts";
 import { getDownloadZipUrl } from "../controller/getDownloadZipUrl.ts";
-import { getFavorite } from "../controller/getFavorite.ts";
 import { createRateLimiter } from "../helper/createRateLimiter.ts";
-import { deleteFile } from "../helper/deleteFile.ts";
-import { downloadZipFile } from "../helper/downloadZipFile.ts";
 import elapsed from "../helper/elapsed.ts";
-import { fileSystemSafeNaming } from "../helper/fileSystemSafeNaming.ts";
-import { getSubdirs } from "../helper/getSubdirs.ts";
+import { galleryAlreadyExist } from "../helper/galleryAlreadyExist.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
-import { zipUrlRateLimit } from "../helper/rateLimits.ts";
-import { unzip } from "../helper/unzip.ts";
+import { favoriteRateLimit, zipUrlRateLimit } from "../helper/rateLimits.ts";
 
-const localLocation = loadGenericEnv("LOCAL_DIRECTORY", "string");
-const apiKey = loadGenericEnv("LOCAL_DIRECTORY", "string");
-
-const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
-const subdirs = await getSubdirs(localLocation);
+const apiKey = loadGenericEnv({
+  identifier: "API_KEY",
+  type: "string",
+});
+const mockSubdirs: string[] = [];
 const start = Date.now();
 
-const samplePage = [1, 2, 3];
-const sampleGallery = (await Promise.all(
-  samplePage.map((page) => getFavorite({ page: page, key: apiKey })),
-))
-  .flatMap((favorite) => favorite.result.map((gallery) => gallery));
+const consumeFavoriteLimit = createRateLimiter(favoriteRateLimit);
+const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
 
-const sampleId = sampleGallery.map((gallery) => gallery.id);
-console.log(`Sample galleries :`);
-console.log(sampleId);
+const maxConcurrentDownloads = 10;
+const inFlight = new Set<Promise<void>>();
 
-let index = 0;
-for (const gallery of sampleGallery) {
-  index += 1;
-  console.log(
-    `(${
-      (elapsed(start) / 1000).toFixed(1)
-    }s)(${index})(${gallery.id}) Checking if gallery already exist.`,
-  );
+let links = 0;
+for await (
+  const gallery of favoritesGenerator({
+    consumer: consumeFavoriteLimit,
+    key: apiKey,
+  }) // Each yielded gallery consumes an API key
+) {
+  const alreadyDownloaded = galleryAlreadyExist({
+    subdirectories: mockSubdirs,
+    gallery,
+  });
 
-  if (subdirs.includes(fileSystemSafeNaming(gallery.english_title))) {
-    console.log(
-      `(${
-        (elapsed(start) / 1000).toFixed(1)
-      }s)(${index})(${gallery.id}) Gallery already downloaded. Skipping it.`,
-    );
+  if (alreadyDownloaded) {
+    mockSubdirs.push(String(gallery.id));
+    links += 1;
     continue;
   }
 
-  console.log(
-    `(${
-      (elapsed(start) / 1000).toFixed(1)
-    }s)(${index})(${gallery.id}) Gallery isn\'t downloaded. Downloading the gallery.`,
-  );
-
-  const zipUrl = await getDownloadZipUrl({ gallery: gallery, key: apiKey });
+  // Back-pressure: wait until a slot is free before consuming zip URL quota
+  while (inFlight.size >= maxConcurrentDownloads) {
+    await Promise.race(inFlight);
+  }
 
   await consumeDownloadLimit();
-  const zipLocation = await downloadZipFile({
-    downloadUrl: zipUrl,
-    gallery: gallery,
-    localLocation: localLocation,
-  }); // API used
+  const _zipUrl = await getDownloadZipUrl({ gallery, key: apiKey }); // API used
+  links += 1;
 
-  await unzip(zipLocation);
-  await deleteFile(zipLocation);
+  // Assumes (download + unzip) process independent of zip URL fetches
+  const task = (async () => {
+    console.log(
+      `(${
+        (elapsed(start) / 1000).toFixed(1)
+      }s) Processing gallery ${gallery.id}`,
+    );
+    await delay(10000);
+  })();
 
-  console.log(
-    `(${
-      (elapsed(start) / 1000).toFixed(1)
-    }s)(${index})(${gallery.id}) Succesfully downloaded gallery.`,
-  );
+  // Track the promise so we can apply back-pressure and await completion
+  task.finally(() => inFlight.delete(task));
+  inFlight.add(task);
 }
+
+console.log(
+  `(${(elapsed(start) / 1000).toFixed(1)}s) Links get : ${links}`,
+);
+
+await Promise.all(inFlight);

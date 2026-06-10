@@ -1,4 +1,3 @@
-import { getFavorite } from "./controller/getFavorite.ts";
 import { getSubdirs } from "./helper/getSubdirs.ts";
 import { favoriteRateLimit, zipUrlRateLimit } from "./helper/rateLimits.ts";
 import { createRateLimiter } from "./helper/createRateLimiter.ts";
@@ -9,7 +8,7 @@ import { getDownloadZipUrl } from "./controller/getDownloadZipUrl.ts";
 import { downloadZipFile } from "./helper/downloadZipFile.ts";
 import { unzip } from "./helper/unzip.ts";
 import { deleteFile } from "./helper/deleteFile.ts";
-import type { Gallery } from "./model/Gallery.ts";
+import { favoritesGenerator } from "./controller/favoritesGenerator.ts";
 
 const flags = parseArgs(Deno.args, {
   string: ["out-dir", "api-key"],
@@ -21,21 +20,6 @@ if (!flags["out-dir"] || !flags["api-key"]) {
     "Missing required arguments. Please provide --out-dir and --api-key.",
   );
   Deno.exit(1);
-}
-
-async function* allFavoriteGalleries(): AsyncGenerator<Gallery> {
-  let page = 0;
-  while (true) {
-    page += 1;
-    await consumeFavoriteLimit();
-    const favorites = await getFavorite({ page, key: apiKey }); // API used
-
-    for (const gallery of favorites.result) {
-      yield gallery;
-    }
-
-    if (!favorites.total || page >= favorites.num_pages) break;
-  }
 }
 
 const localLocation = flags["out-dir"];
@@ -67,10 +51,15 @@ const progressInterval = setInterval(() => {
 }, 100);
 
 // Fetch zip URLs and immediately kick off the download+unzip as a floating promise, tracking it in `inFlight`
-const MAX_CONCURRENT_DOWNLOADS = 7; // Optimally, you would tune this according to your disk/network performance
+const maxConcurrentDownloads = 7; // Optimally, you would tune this according to your disk/network performance
 const inFlight = new Set<Promise<void>>();
 
-for await (const gallery of allFavoriteGalleries()) {
+for await (
+  const gallery of favoritesGenerator({
+    consumer: consumeFavoriteLimit,
+    key: apiKey,
+  }) // Each yielded gallery consumes an API usage
+) {
   const alreadyDownloaded = galleryAlreadyExist({
     subdirectories: subdirs,
     gallery,
@@ -83,7 +72,7 @@ for await (const gallery of allFavoriteGalleries()) {
   }
 
   // Back-pressure: wait until a slot is free before consuming zip URL quota
-  while (inFlight.size >= MAX_CONCURRENT_DOWNLOADS) {
+  while (inFlight.size >= maxConcurrentDownloads) {
     await Promise.race(inFlight);
   }
 

@@ -5,7 +5,10 @@ import { createRateLimiter } from "../helper/createRateLimiter.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import { favoriteRateLimit } from "../helper/rateLimits.ts";
 
-const apiKey = loadGenericEnv("LOCAL_DIRECTORY", "string");
+const apiKey = loadGenericEnv({
+  identifier: "LOCAL_DIRECTORY",
+  type: "string",
+});
 
 let programIsRunning = true;
 let currentFavoritesPage = 0;

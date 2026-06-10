@@ -7,14 +7,16 @@ let galleryProcessed = 0;
 let gallerySkipped = 0;
 let galleryDownloaded = 0;
 
-renderProgress(start, {
+renderProgress({
+  start,
   processed: galleryProcessed,
   skipped: gallerySkipped,
   downloaded: galleryDownloaded,
 });
 
 setInterval(() => {
-  updateProgress(start, {
+  updateProgress({
+    start,
     processed: galleryProcessed,
     skipped: gallerySkipped,
     downloaded: galleryDownloaded,
