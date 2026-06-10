@@ -6,9 +6,9 @@ import type { RateLimit } from "../model/RateLimit.ts";
  *
  * @example Usage
  * ```ts
- * import { createRateLimiter } from "./rateLimiter.ts";
+ * import { rateLimiterFactory } from "./rateLimiter.ts";
  * const operationRateLimit = { timeMilliseconds: 60000, usage: 100 };
- * const consumeOperationRateLimit = createRateLimiter(operationRateLimit);
+ * const consumeOperationRateLimit = rateLimiterFactory(operationRateLimit);
  * await consumeOperationRateLimit();
  * await operation()
  * ```
@@ -19,8 +19,8 @@ import type { RateLimit } from "../model/RateLimit.ts";
  *
  * @returns An async function that resolves once a sliding-window slot becomes available.
  */
-export const createRateLimiter = (limit: RateLimit) => {
-  const error = 2500;
+export const rateLimiterFactory = (limit: RateLimit) => {
+  const error = 10000;
   const requestTimestamps: number[] = [];
 
   const consumeRateLimit = async () => {

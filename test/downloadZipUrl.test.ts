@@ -3,7 +3,7 @@
 import { delay } from "@std/async/delay";
 import { favoritesGenerator } from "../controller/favoritesGenerator.ts";
 import { getDownloadZipUrl } from "../controller/getDownloadZipUrl.ts";
-import { createRateLimiter } from "../helper/createRateLimiter.ts";
+import { rateLimiterFactory } from "../helper/rateLimiterFactory.ts";
 import elapsed from "../helper/elapsed.ts";
 import { galleryAlreadyExist } from "../helper/galleryAlreadyExist.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
@@ -16,8 +16,8 @@ const apiKey = loadGenericEnv({
 const mockSubdirs: string[] = [];
 const start = Date.now();
 
-const consumeFavoriteLimit = createRateLimiter(favoriteRateLimit);
-const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
+const consumeFavoriteLimit = rateLimiterFactory(favoriteRateLimit);
+const consumeDownloadLimit = rateLimiterFactory(zipUrlRateLimit);
 
 const maxConcurrentDownloads = 10;
 const inFlight = new Set<Promise<void>>();

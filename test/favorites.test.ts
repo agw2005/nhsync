@@ -1,7 +1,7 @@
 // deno run --allow-env --allow-net --env=.env test/favorites.test.ts
 
 import { getFavorite } from "../controller/getFavorite.ts";
-import { createRateLimiter } from "../helper/createRateLimiter.ts";
+import { rateLimiterFactory } from "../helper/rateLimiterFactory.ts";
 import { loadGenericEnv } from "../helper/loadGenericEnv.ts";
 import { favoriteRateLimit } from "../helper/rateLimits.ts";
 
@@ -14,7 +14,7 @@ let programIsRunning = true;
 let currentFavoritesPage = 0;
 let galleryProcessed = 0;
 
-const consumeFavoriteLimit = createRateLimiter(favoriteRateLimit);
+const consumeFavoriteLimit = rateLimiterFactory(favoriteRateLimit);
 
 while (programIsRunning) {
   currentFavoritesPage += 1;

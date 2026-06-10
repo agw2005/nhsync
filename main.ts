@@ -1,6 +1,6 @@
 import { getSubdirs } from "./helper/getSubdirs.ts";
 import { favoriteRateLimit, zipUrlRateLimit } from "./helper/rateLimits.ts";
-import { createRateLimiter } from "./helper/createRateLimiter.ts";
+import { rateLimiterFactory } from "./helper/rateLimiterFactory.ts";
 import { renderProgress, updateProgress } from "./helper/progressRenderer.ts";
 import { parseArgs } from "@std/cli/parse-args";
 import { galleryAlreadyExist } from "./helper/galleryAlreadyExist.ts";
@@ -28,8 +28,8 @@ const apiKey = flags["api-key"];
 const subdirs = await getSubdirs(localLocation);
 const start = Date.now();
 
-const consumeFavoriteLimit = createRateLimiter(favoriteRateLimit);
-const consumeDownloadLimit = createRateLimiter(zipUrlRateLimit);
+const consumeFavoriteLimit = rateLimiterFactory(favoriteRateLimit);
+const consumeDownloadLimit = rateLimiterFactory(zipUrlRateLimit);
 
 let galleryProcessed = 0;
 let gallerySkipped = 0;
