@@ -30,9 +30,14 @@ export const downloadZipFile = async (option: {
   gallery: Gallery;
   localLocation: string;
 }): Promise<string> => {
+  const safeName = sanitize(option.gallery.english_title);
+  const filenameLengthLimit = 200;
+
   const destinationPath = join(
     option.localLocation,
-    `${sanitize(option.gallery.english_title)}.zip`,
+    `${
+      safeName.length < filenameLengthLimit ? safeName : option.gallery.id
+    }.zip`,
   );
 
   await ensureDir(option.localLocation);

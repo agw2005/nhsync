@@ -28,7 +28,7 @@ export const galleryAlreadyExist = (
   if (
     option.subdirectories.includes(
       sanitize(option.gallery.english_title),
-    )
+    ) || option.subdirectories.includes(String(option.gallery.id))
   ) {
     return true;
   } else {
